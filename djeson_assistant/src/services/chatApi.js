@@ -1,0 +1,22 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
+export async function sendMessage(message, history = []) {
+  let response;
+  try {
+    response = await fetch(`${API_URL}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, history }),
+    });
+  } catch {
+    throw new Error("Impossible de joindre le serveur. Vérifie ta connexion.");
+  }
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error ?? `Erreur serveur (${response.status})`);
+  }
+
+  const data = await response.json();
+  return data.reply;
+}
